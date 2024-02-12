@@ -53,7 +53,7 @@ def degcounter(yv,acc):
 colors={1:'black',2:'darkorange',3:'limegreen',4:'darkgreen',5:'pink',6:'blue',7:'darkblue',8:'cyan',9:'yellow',10:'rebeccapurple',11:'green',12:'maroon',15:'violet',13:'violet',14:'brown',16:'indigo',17:'gold',18:'navy',19:'orange',20:'magenta',21:'darkblue',22:'maroon',23:'yellow',24:'red',25:'cyan',30:'brown',32:'maroon',33:'slateblue',34:'brown',35:'peru',36:'brown',48:'crimson',49:'purple',68:'yellow',70:'red'}
 
 
-def chained_path_plot_link(path_list,kpoints,generate_Hk,UHK,mu,Umu,Utau,Uff,names_reversed):
+def chained_path_plot_link(path_list,kpoints,generate_Hk,UHK,mu,Umu,Utau,Uff,names_reversed_var):
     #Note: here generate_Hk is the hamiltonian, but which only accepts the k-coordinates as arguments
     #the U's are just there so that I can feed them into the string which describes the output - probably a more efficient way to do it
     #
@@ -79,10 +79,7 @@ def chained_path_plot_link(path_list,kpoints,generate_Hk,UHK,mu,Umu,Utau,Uff,nam
             
 
             kgrid_dic[(j[0],j[1])]=(list(twoparticleenergies),degcounter(twoparticleenergies,acc=acc0))
-    
-    filename=f"oneparticle{names_reversed_Moire[str(path_list[0])]}to{names_reversed_Moire[str(path_list[1])]}UHK{UHK}mu{int(mu)}Umu{Umu}Utau{Utau}Uff{Uff}kp{kpoints}theta{round(theta*180/np.pi,2)}"
+    filename=f"NewConv_diagandtun_oneparticle{names_reversed_var[str(path_list[0])]}to{names_reversed_var[str(path_list[1])]}UHK{UHK}mu{int(mu)}Umu{Umu}Utau{Utau}Uff{Uff}kp{kpoints}theta{round(theta*180/np.pi,2)}"
     print(filename)
-    print(str(path_list[0]))
-    exit()
     json_save('pathdata/'+filename+'datadic.json',convert_to_json(kgrid_dic))
 

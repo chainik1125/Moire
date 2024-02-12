@@ -200,9 +200,9 @@ def chained_path_plot_link(path_list,start_path_count,axs,single,kpoints,directo
 
     for i in range(0,len(path_list)-1):
         list_temp=[path_list[i],path_list[i+1]]
-        start_string=var_file_reversed[tuple(list_temp[0])]
+        start_string=var_file_reversed_Moire[tuple(list_temp[0])]
 
-        end_string=var_file_reversed[tuple(list_temp[1])]
+        end_string=var_file_reversed_Moire[tuple(list_temp[1])]
         grouped_dic=group_parts_dic(directory=directory,dstr=dstr,start_string=start_string,end_string=end_string,kpoints=kpoints,params=params,variable=variable,theta=theta)
         
         x_values,y_values,deg_values=grids_from_dic(stitched_dic=grouped_dic,start=tuple(list_temp[0]),end=tuple(list_temp[1]))
@@ -214,7 +214,7 @@ def chained_path_plot_link(path_list,start_path_count,axs,single,kpoints,directo
             eig_dict_loop[k]=([y[k]-mu_shift for y in y_values],[j[k] for j in deg_values])#[y[k]-y[0] for y in y_values]
             deg_list=list(set(list(set(deg_list))+list(set([j[k] for j in deg_values]))))
         # for j in eig_dict_loop.keys():
-        for j in [4,5]:#The end-point sets how many lines you plot.
+        for j in eig_dict_loop.keys():#The end-point sets how many lines you plot. [4,5]
             # annot = axs[i].annotate("", xy=(0,0), xytext=(20,20),textcoords="offset points",
             #             bbox=dict(boxstyle="round", fc="w"),
             #             arrowprops=dict(arrowstyle="->"))
@@ -237,17 +237,17 @@ def chained_path_plot_link(path_list,start_path_count,axs,single,kpoints,directo
                 axs.scatter(x_values,eig_dict_loop[j][0],s=0.3,c=colorsmap)#facecolor=degcmap(eig_dict_loop[j][1])
                 #axs.set_title(f"{var_dict_reversed[tuple(list_temp[0])]} to {var_dict_reversed[tuple(list_temp[1])]}",fontsize=tickfontsize)
                 axs.set_xticks([-0.1])
-                axs.set_xticklabels([var_dict_reversed[tuple(list_temp[0])]],fontsize=tickfontsize)#+ '\n'+ var_greek_dict[tuple(list_temp[0])]
+                axs.set_xticklabels([var_dict_reversed_Moire[tuple(list_temp[0])]],fontsize=tickfontsize)#+ '\n'+ var_greek_dict[tuple(list_temp[0])]
                 axs[i+start_path_count].tick_params(axis='x', length=0)
                 axs[i+start_path_count].tick_params(axis='y', labelsize=ylabelsize)
                 # axs.set_ylim([0, 2])
                 if i==len(path_list)-2:
                     if np.equal(path_list[i+1],A).all():
                         axs[i+start_path_count].set_xticks([-0.1,1.1])
-                        axs[i+start_path_count].set_xticklabels([var_dict_reversed[tuple(list_temp[0])],var_dict_reversed[tuple(list_temp[1])]],fontsize=tickfontsize)#+ '\n'+ var_greek_dict[tuple(list_temp[0])], + '\n'+ var_greek_dict[tuple(list_temp[1])]
+                        axs[i+start_path_count].set_xticklabels([var_dict_reversed_Moire[tuple(list_temp[0])],var_dict_reversed_Moire[tuple(list_temp[1])]],fontsize=tickfontsize)#+ '\n'+ var_greek_dict[tuple(list_temp[0])], + '\n'+ var_greek_dict[tuple(list_temp[1])]
                     else:
                         axs[i+start_path_count].set_xticks([-0.1,1.2])
-                        axs[i+start_path_count].set_xticklabels([var_dict_reversed[tuple(list_temp[0])]+'|',var_dict_reversed[tuple(list_temp[1])]+'|'],fontsize=tickfontsize)#+ '\n'+ var_greek_dict[tuple(list_temp[0])], + '\n'+ var_greek_dict[tuple(list_temp[1])]
+                        axs[i+start_path_count].set_xticklabels([var_dict_reversed_Moire[tuple(list_temp[0])]+'|',var_dict_reversed_Moire[tuple(list_temp[1])]+'|'],fontsize=tickfontsize)#+ '\n'+ var_greek_dict[tuple(list_temp[0])], + '\n'+ var_greek_dict[tuple(list_temp[1])]
             else:
                 axs[i+start_path_count].scatter(x_values,eig_dict_loop[j][0],s=0.3,c=colorsmap)#facecolor=degcmap(eig_dict_loop[j][1])
                 #axs[i+start_path_count].set_title(f"{var_dict_reversed[tuple(list_temp[0])]} to {var_dict_reversed[tuple(list_temp[1])]}",fontsize=tickfontsize)
@@ -255,7 +255,7 @@ def chained_path_plot_link(path_list,start_path_count,axs,single,kpoints,directo
                 # g=var_greek_dict[tuple(list_temp[0])]
                 #endstr=r'${{}}\tiny{}$'.format(g)
                 # endstr=r'\small{{{}}}$'.format(g)
-                axs[i+start_path_count].set_xticklabels([var_dict_reversed[tuple(list_temp[0])]+'\n'+ var_greek_dict[tuple(list_temp[0])]],fontsize=15)#+ 
+                axs[i+start_path_count].set_xticklabels([var_dict_reversed_Moire[tuple(list_temp[0])]+'\n'+ var_greek_dict_Moire[tuple(list_temp[0])]],fontsize=15)#+ 
                 axs[i+start_path_count].tick_params(axis='x', length=0)
                 axs[i+start_path_count].tick_params(axis='y', labelsize=ylabelsize)
                 #axs[i+start_path_count].set_ylim([-11-6, -6-6])
@@ -263,7 +263,7 @@ def chained_path_plot_link(path_list,start_path_count,axs,single,kpoints,directo
                     if np.equal(path_list[i+1],A).all():
                         # print(np.equal(path_list[i+1],A).all())
                         axs[i+start_path_count].set_xticks([0,1])
-                        axs[i+start_path_count].set_xticklabels([var_dict_reversed[tuple(list_temp[0])]+'\n'+ var_greek_dict[tuple(list_temp[0])],var_dict_reversed[tuple(list_temp[1])]+ '\n'+ var_greek_dict[tuple(list_temp[1])]],fontsize=15)
+                        axs[i+start_path_count].set_xticklabels([var_dict_reversed_Moire[tuple(list_temp[0])]+'\n'+ var_greek_dict_Moire[tuple(list_temp[0])],var_dict_reversed_Moire[tuple(list_temp[1])]+ '\n'+ var_greek_dict_Moire[tuple(list_temp[1])]],fontsize=15)
                         axs[i+start_path_count].tick_params(axis='x', length=0)
                     else:
                         if len(path_list)==2:
@@ -305,7 +305,7 @@ def chained_path_plot(path_lists,kpoints,directory,dstr,mu_shift,params,variable
             start_path_count=0
     
     
-    axs[0].set_ylabel(r'$E_{2}(\mathbf{k})/t$',fontsize=labelfontsize)
+    axs[0].set_ylabel(r'$E_{1}(\mathbf{k})/t$',fontsize=labelfontsize)
     #axs[0].set_ylabel(r'$(E_{4}(\mathbf{{k}})-E_{4,GS}(\mathbf{{k}}))/t$',fontsize=labelfontsize)
     plt.subplots_adjust(wspace=.0)
     custom_lines=[]
@@ -318,13 +318,14 @@ def chained_path_plot(path_lists,kpoints,directory,dstr,mu_shift,params,variable
     #leg = plt.figlegend(custom_lines,names, loc=(0.87, 0.11),title="Degeneracy",fontsize=20,title_fontsize=20)#0.464
     fig.subplots_adjust(right=0.85)
     angle=theta.split('theta')[-1]
-    fig.suptitle(r'Two particle $\theta=$'+f'{angle}'+r'$^{\circ}$'+',  '+r'$U_{HK}=$'+f'{params[-1]}', fontsize=16)
+    fig.suptitle(r'One particle $\theta=$'+f'{angle}'+r'$^{\circ}$'+',  '+r'$U_{HK}=$'+f'{params[-1]}', fontsize=16)
     
     plt.show()
 
-mu_shift1=1
-params='UHK10'
-theta='theta1.05'
-#chained_path_plot(path_lists=[[Gamma,X,M]],kpoints="1000",directory=d6,dstr=dstr6,mu_shift=mu_shift1)
-chained_path_plot(path_lists=[[A,B,C,D,A]],kpoints="100",directory=directory,dstr=dstr,mu_shift=mu_shift1,params=params,variable='twoparticle',theta=theta)
-# chained_path_plot([[Gamma,X,M,Gamma,Z],[X,R],[M,A,R,Z,A]])
+if __name__ == "__main__":
+    mu_shift1=1
+    params='UHK10'
+    theta='theta1.05'
+    #chained_path_plot(path_lists=[[Gamma,X,M]],kpoints="1000",directory=d6,dstr=dstr6,mu_shift=mu_shift1)
+    chained_path_plot(path_lists=[[KM,GammaM,KM]],kpoints="100",directory=directory,dstr=dstr,mu_shift=mu_shift1,params=params,variable='oneparticle',theta=theta)
+    # chained_path_plot([[Gamma,X,M,Gamma,Z],[X,R],[M,A,R,Z,A]])

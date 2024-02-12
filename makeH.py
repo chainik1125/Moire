@@ -596,16 +596,26 @@ def inspect_elements(matrix,state_list):
 
 
 #Now let's build up the tunnelling matrices
-def t1(sigma):
+def t1_plus(sigma):
     newsigma=(sigma[0]-1,sigma[1]-1)#i.e this is equivalent to adding q1 to the state. - I guess this is not good, because you're not tying it to your definition of the qs!
     return (1,newsigma)
-
-def t2(sigma):
-    newsigma=(sigma[0]+1,sigma[1])#i.e this is equivalent to adding q1 to the state. - I guess this is not good, because you're not tying it to your definition of the qs!
+#Now let's build up the tunnelling matrices
+def t1_minus(sigma):
+    newsigma=(sigma[0]+1,sigma[1]+1)#i.e this is equivalent to adding q1 to the state. - I guess this is not good, because you're not tying it to your definition of the qs!
     return (1,newsigma)
 
-def t3(sigma):
+def t2_plus(sigma):
+    newsigma=(sigma[0]+1,sigma[1])#i.e this is equivalent to adding q1 to the state. - I guess this is not good, because you're not tying it to your definition of the qs!
+    return (1,newsigma)
+def t2_minus(sigma):
+    newsigma=(sigma[0]-1,sigma[1])#i.e this is equivalent to adding q1 to the state. - I guess this is not good, because you're not tying it to your definition of the qs!
+    return (1,newsigma)
+
+def t3_plus(sigma):
     newsigma=(sigma[0],sigma[1]+1)#i.e this is equivalent to adding q1 to the state. - I guess this is not good, because you're not tying it to your definition of the qs!
+    return (1,newsigma)
+def t3_minus(sigma):
+    newsigma=(sigma[0],sigma[1]-1)#i.e this is equivalent to adding q1 to the state. - I guess this is not good, because you're not tying it to your definition of the qs!
     return (1,newsigma)
 
     
@@ -638,6 +648,11 @@ def gky(kx,ky):
     return ky
 def g0(kx,ky):
     return 1
+def gw(w):
+    # Define a new function that takes a and b, and uses the captured c
+    def multiplied_function(kx, ky):
+        return w * g0(kx, ky)
+    return multiplied_function
 def gtx(phi):
     return np.cos(phi)
 def gty(phi):
@@ -647,9 +662,9 @@ def gty(phi):
 
 diag_term=({0:p0,1:t0,2:px,3:p0},gkx)
 linear_terms=[({0:p0,1:t0,2:px,3:p0},gkx),({0:p0,1:t0,2:py,3:p0},gky),({0:p0,1:tqx,2:px,3:p0},g0),({0:p0,1:tqy,2:py,3:p0},g0)]
-tun_terms=[({0:px,1:t1,2:p0,3:p0},1),({0:px,1:t1,2:px,3:p0},gtx(phi=0)),({0:px,1:t1,2:py,3:p0},gty(phi=0)),
-           ({0:px,1:t2,2:p0,3:p0},1),({0:px,1:t2,2:px,3:p0},gtx(phi=phi)),({0:px,1:t2,2:py,3:p0},gty(phi=phi)),
-           ({0:px,1:t3,2:p0,3:p0},1),({0:px,1:t2,2:px,3:p0},gtx(phi=-phi)),({0:px,1:t3,2:py,3:p0},gty(phi=-phi))]#
+# tun_terms=[({0:px,1:t1,2:p0,3:p0},1),({0:px,1:t1,2:px,3:p0},gtx(phi=0)),({0:px,1:t1,2:py,3:p0},gty(phi=0)),
+#            ({0:px,1:t2,2:p0,3:p0},1),({0:px,1:t2,2:px,3:p0},gtx(phi=phi)),({0:px,1:t2,2:py,3:p0},gty(phi=phi)),
+#            ({0:px,1:t3,2:p0,3:p0},1),({0:px,1:t2,2:px,3:p0},gtx(phi=-phi)),({0:px,1:t3,2:py,3:p0},gty(phi=-phi))]#
 def h_linear_diag(km,v,term_list,state_list):
     H0=np.zeros((len(state_list),len(state_list)),dtype=complex)
     for term in term_list:
@@ -1113,10 +1128,12 @@ def generate_H2(kx,ky,theta,phi,state_list,diag_terms,tun_terms,UHK,mu):
 
 if __name__ == "__main__":
     import pathdiag
+    import plot
+    import os
     t=1
-    v=3*t/2
-    w0=2*t
-    w1=2*t
+    v=5.944
+    w1=0.11
+    w0=0.7*w1
     testpdd={'k':4,'sublattice':2,'spin':2}
     kd2=np.array([0,4*np.pi/3])
     k1=np.array([0,-1])
@@ -1140,7 +1157,7 @@ if __name__ == "__main__":
     phi0=2*np.pi/3
     test1=diagtpp(state_list=ordered_basis2,theta=theta0,layer_pauli_dic=kinetic_diag[0][1],prefactor=kinetic_diag[0][0],k0=k0)
 
-    test_tun_dic=[[1,(0,1),{0:p0,1:t1,2:p0}],[1,(0,2),{0:p0,1:t2,2:p0}],[1,(0,3),{0:p0,1:t3,2:p0}]]
+    # test_tun_dic=[[1,(0,1),{0:p0,1:t1,2:p0}],[1,(0,2),{0:p0,1:t2,2:p0}],[1,(0,3),{0:p0,1:t3,2:p0}]]
 
     #test_tun=tunnelling_blocks(k0=np.array([0,0]),theta=theta0,phi=phi0,state_list=ordered_basis4,tun_pauli_dic=test_tun_dic[2][2],prefactor=test_tun_dic[2][0],hopping=test_tun_dic[2][1])
     #inspect_elements(matrix=test_tun,state_list=ordered_basis4)
@@ -1179,15 +1196,34 @@ if __name__ == "__main__":
     test_linear_terms=[({0:p0,1:qkx,2:px,3:p0},g0),({0:p0,1:qky,2:py,3:p0},g0),({0:p0,1:t0,2:px,3:p0},gkx),({0:p0,1:t0,2:py,3:p0},gky)]
     shell_basis=generate_shell_basis(shell_count=2,q_vecs=tqs,number_of_particles=1,nonlayer=testnonlayer)
     test_tpp=tpp(state_list=shell_basis,pauli_dic={0:p0,1:qkx,2:px,3:p0},prefactor=1)
-    
+    test_tun_terms=[({0:px,1:t1_plus,2:p0,3:p0},gw(w0)),({0:px,1:t1_minus,2:p0,3:p0},gw(w0)),({0:px,1:t1_plus,2:px,3:p0},gw(w1*np.cos(phi*(1-1)))),({0:px,1:t1_minus,2:px,3:p0},gw(w1*np.cos(phi*(1-1)))),
+                    ({0:px,1:t2_plus,2:p0,3:p0},gw(w0)),({0:px,1:t2_plus,2:px,3:p0},gw(w1*np.cos(phi*(2-1)))),({0:px,1:t2_plus,2:py,3:p0},gw(w1*np.sin(phi*(2-1)))),
+                    ({0:px,1:t2_minus,2:p0,3:p0},gw(w0*1)),({0:px,1:t2_minus,2:px,3:p0},gw(w1*np.cos(phi*(2-1)))),({0:px,1:t2_minus,2:py,3:p0},gw(w1*np.sin(phi*(2-1)))),
+                    ({0:px,1:t3_plus,2:p0,3:p0},gw(w0*1)),({0:px,1:t3_plus,2:px,3:p0},gw(w1*np.cos(phi*(3-1)))),({0:px,1:t3_plus,2:py,3:p0},gw(w1*np.sin(phi*(3-1)))),
+                    ({0:px,1:t3_minus,2:p0,3:p0},gw(w0*1)),({0:px,1:t3_minus,2:px,3:p0},gw(w1*np.cos(phi*(3-1)))),({0:px,1:t3_minus,2:py,3:p0},gw(w1*np.sin(phi*(3-1))))]
     #print(shell_basis[0].particle_dic[1].dof_dic.keys())
-    testh0=h_linear_diag(km=np.array([0,0]),v=1,term_list=test_linear_terms,state_list=shell_basis)
-    testh0=testh0*(1/kd)
-    # inspect_elements(state_list=shell_basis,matrix=testh0)
+    testh0=h_linear_diag(km=GammaM,v=1,term_list=test_tun_terms,state_list=shell_basis)
+    print(testh0.shape)
+    testh0=testh0
+    inspect_elements(state_list=shell_basis,matrix=testh0)
+    print(np.allclose(np.abs(testh0-np.conjugate(np.transpose(testh0))),np.zeros(testh0.shape)))
+ 
+    #print(np.linalg.eigh(testh0)[0])
+    
     # print(testh0)
     start='KM'
     end='GammaM'
     def gen_Hk(kx,ky):
-        return h_linear_diag(km=np.array([kx,ky]),v=1,term_list=test_linear_terms,state_list=shell_basis)
-    pathdiag.chained_path_plot_link(path_list=[vars_dic[start],vars_dic[end]],kpoints=100,generate_Hk=gen_Hk,UHK=UHK,mu=mu,Utau=Utau,Umu=Umu,Uff=Uff,names_reversed=names_reversed)
-   
+        H_linear=h_linear_diag(km=np.array([kx,ky]),v=v,term_list=test_linear_terms,state_list=shell_basis)
+        H_tun=h_linear_diag(km=np.array([kx,ky]),state_list=shell_basis,term_list=test_tun_terms,v=1)
+        return (H_linear+H_tun)
+    pathdiag.chained_path_plot_link(path_list=[vars_dic_Moire[start],vars_dic_Moire[end]],kpoints=300,generate_Hk=gen_Hk,UHK=UHK,mu=mu,Utau=Utau,Umu=Umu,Uff=Uff,names_reversed_var=names_reversed_Moire)
+    pathdiag.chained_path_plot_link(path_list=[vars_dic_Moire['GammaM'],vars_dic_Moire['MM']],kpoints=300,generate_Hk=gen_Hk,UHK=UHK,mu=mu,Utau=Utau,Umu=Umu,Uff=Uff,names_reversed_var=names_reversed_Moire)
+    pathdiag.chained_path_plot_link(path_list=[vars_dic_Moire['MM'],vars_dic_Moire['KM']],kpoints=300,generate_Hk=gen_Hk,UHK=UHK,mu=mu,Utau=Utau,Umu=Umu,Uff=Uff,names_reversed_var=names_reversed_Moire)
+    directory = os.fsencode("/Users/dmitrymanning-coe/Documents/Research/Barry Bradlyn/Moire/Numerics/pathdata")
+    dstr="/Users/dmitrymanning-coe/Documents/Research/Barry Bradlyn/Moire/Numerics/pathdata"
+    UHK=0
+    mu_shift1=UHK/2
+    params='UHK10'
+    theta='theta1.05'
+    plot.chained_path_plot(path_lists=[[KM,GammaM,MM,KM]],kpoints="300",directory=directory,dstr=dstr,mu_shift=mu_shift1,params=params,variable='diagandtun',theta=theta)    
