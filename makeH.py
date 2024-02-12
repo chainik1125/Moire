@@ -653,6 +653,27 @@ def gw(w):
     def multiplied_function(kx, ky):
         return w * g0(kx, ky)
     return multiplied_function
+def gkxw(w):
+    # Define a new function that takes a and b, and uses the captured c
+    def multiplied_function(kx, ky):
+        return w * gkx(kx, ky)
+    return multiplied_function
+def gkyw(w):
+    # Define a new function that takes a and b, and uses the captured c
+    def multiplied_function(kx, ky):
+        return w * gky(kx, ky)
+    return multiplied_function
+
+def gcos(w,theta):
+    # Define a new function that takes a and b, and uses the captured c
+    def multiplied_function(kx, ky):
+        return w * np.cos(theta)* g0(kx, ky)
+    return multiplied_function
+def gsin(w,theta):
+    # Define a new function that takes a and b, and uses the captured c
+    def multiplied_function(kx, ky):
+        return w * np.sin(theta)* g0(kx, ky)
+    return multiplied_function
 def gtx(phi):
     return np.cos(phi)
 def gty(phi):
@@ -1130,10 +1151,7 @@ if __name__ == "__main__":
     import pathdiag
     import plot
     import os
-    t=1
-    v=5.944
-    w1=0.11
-    w0=0.7*w1
+
     testpdd={'k':4,'sublattice':2,'spin':2}
     kd2=np.array([0,4*np.pi/3])
     k1=np.array([0,-1])
@@ -1193,21 +1211,104 @@ if __name__ == "__main__":
     # inspect_elements(testsw,state_list=basis2)
     tqs=[np.array([-1,-1]),np.array([1,0]),np.array([0,1])]
     #test_linear_terms=[({0:p0,1:qkx,2:px,3:p0},gkx),({0:p0,1:qky,2:py,3:p0},gky)]
+    #Can put in small angle correction, from TBG II, but it doesn't look like it makes much difference. Argh!
     test_linear_terms=[({0:p0,1:qkx,2:px,3:p0},g0),({0:p0,1:qky,2:py,3:p0},g0),({0:p0,1:t0,2:px,3:p0},gkx),({0:p0,1:t0,2:py,3:p0},gky)]
-    shell_basis=generate_shell_basis(shell_count=2,q_vecs=tqs,number_of_particles=1,nonlayer=testnonlayer)
+    test_linear_terms_nonzero=[({0:p0,1:qkx,2:px,3:p0},gw(np.cos(theta/2))),({0:p0,1:t0,2:px,3:p0},gkxw(np.cos(theta/2))),
+                            ({0:pz,1:qkx,2:py,3:p0},gw(-np.sin(theta/2))),({0:pz,1:t0,2:py,3:p0},gkxw(-np.sin(theta/2))),
+                            ({0:p0,1:qky,2:py,3:p0},gw(np.cos(theta/2))),({0:p0,1:t0,2:py,3:p0},gkyw(np.cos(theta/2))),
+                            ({0:pz,1:qky,2:px,3:p0},gw(np.sin(theta/2))),({0:pz,1:t0,2:px,3:p0},gkyw(np.sin(theta/2))),
+                            ]
+    shell_basis=generate_shell_basis(shell_count=4,q_vecs=tqs,number_of_particles=1,nonlayer=testnonlayer)
+    # for i in shell_basis:
+    #     print(eyepreservation(i))
+    # exit()
+    print(eyepreservation(shell_basis[-8]))
+    
+    
+    testh0=h_linear_diag(km=GammaM,v=1,term_list=test_linear_terms,state_list=shell_basis)
     test_tpp=tpp(state_list=shell_basis,pauli_dic={0:p0,1:qkx,2:px,3:p0},prefactor=1)
+
     test_tun_terms=[({0:px,1:t1_plus,2:p0,3:p0},gw(w0)),({0:px,1:t1_minus,2:p0,3:p0},gw(w0)),({0:px,1:t1_plus,2:px,3:p0},gw(w1*np.cos(phi*(1-1)))),({0:px,1:t1_minus,2:px,3:p0},gw(w1*np.cos(phi*(1-1)))),
                     ({0:px,1:t2_plus,2:p0,3:p0},gw(w0)),({0:px,1:t2_plus,2:px,3:p0},gw(w1*np.cos(phi*(2-1)))),({0:px,1:t2_plus,2:py,3:p0},gw(w1*np.sin(phi*(2-1)))),
-                    ({0:px,1:t2_minus,2:p0,3:p0},gw(w0*1)),({0:px,1:t2_minus,2:px,3:p0},gw(w1*np.cos(phi*(2-1)))),({0:px,1:t2_minus,2:py,3:p0},gw(w1*np.sin(phi*(2-1)))),
-                    ({0:px,1:t3_plus,2:p0,3:p0},gw(w0*1)),({0:px,1:t3_plus,2:px,3:p0},gw(w1*np.cos(phi*(3-1)))),({0:px,1:t3_plus,2:py,3:p0},gw(w1*np.sin(phi*(3-1)))),
-                    ({0:px,1:t3_minus,2:p0,3:p0},gw(w0*1)),({0:px,1:t3_minus,2:px,3:p0},gw(w1*np.cos(phi*(3-1)))),({0:px,1:t3_minus,2:py,3:p0},gw(w1*np.sin(phi*(3-1))))]
+                    ({0:px,1:t2_minus,2:p0,3:p0},gw(w0)),({0:px,1:t2_minus,2:px,3:p0},gw(w1*np.cos(phi*(2-1)))),({0:px,1:t2_minus,2:py,3:p0},gw(w1*np.sin(phi*(2-1)))),
+                    ({0:px,1:t3_plus,2:p0,3:p0},gw(w0)),({0:px,1:t3_plus,2:px,3:p0},gw(w1*np.cos(phi*(3-1)))),({0:px,1:t3_plus,2:py,3:p0},gw(w1*np.sin(phi*(3-1)))),
+                    ({0:px,1:t3_minus,2:p0,3:p0},gw(w0)),({0:px,1:t3_minus,2:px,3:p0},gw(w1*np.cos(phi*(3-1)))),({0:px,1:t3_minus,2:py,3:p0},gw(w1*np.sin(phi*(3-1))))]
     #print(shell_basis[0].particle_dic[1].dof_dic.keys())
-    testh0=h_linear_diag(km=GammaM,v=1,term_list=test_tun_terms,state_list=shell_basis)
+    t1_test=[({0:px,1:t1_minus,2:p0,3:p0},gw(w0)),({0:px,1:t1_plus,2:p0,3:p0},gw(w0))]#({0:px,1:t1_plus,2:p0,3:p0},gw(w0)),({0:px,1:t1_plus,2:px,3:p0},gw(w1*np.cos(phi*(1-1)))),({0:px,1:t1_minus,2:px,3:p0},gw(w1*np.cos(phi*(1-1))))
+    testh0=h_linear_diag(km=GammaM,v=1,term_list=t1_test,state_list=shell_basis)
+
     print(testh0.shape)
-    testh0=testh0
+    testwf=np.zeros(len(shell_basis),dtype=complex)
+    ind=-8
+    testwf[-8]=1
+    print(eyepreservation(shell_basis[ind]))
+    print(eyepreservation(shell_basis[44]))
+    print(shell_basis.index(shell_basis[-3]))
+    print(type(shell_basis))
+    print(len(shell_basis))
+    count=0
+    for i in shell_basis:
+        count+=1
+        print(count,eyepreservation(i))
+    exit()
+    state=shell_basis[ind]
+    print(state.particle_dic[1].dof_dic.keys())
+    print(state.particle_dic[1].dof_dic[0])
+    pxres=px(state.particle_dic[1].dof_dic[0])
+    qres=t1_minus(state.particle_dic[1].dof_dic[1])
+    taures=p0(state.particle_dic[1].dof_dic[2])
+    spinres=p0(state.particle_dic[1].dof_dic[3])
+    print(pxres,qres,taures,spinres)
+    pauli_dic=t1_test[0][0]
+    dof_dic_temp={}
+    particle_dic_temp1={}
+    result_list=[]
+    H10=np.zeros((len(shell_basis),len(shell_basis)),dtype=complex)
+    for k in state.particle_dic.keys():
+        print(f'k={k}')
+        coeff=1
+        for l in range(0,dof):
+            dof_dic_temp[l]=pauli_dic[l](state.particle_dic[k].dof_dic[l])[1]
+            coeff=coeff*pauli_dic[l](state.particle_dic[k].dof_dic[l])[0]
+        particlen=particle(dof_dic=dict(dof_dic_temp))
+        particle_dic_temp1[k]=particlen
+        for j in state.particle_dic.keys():
+            if j!=k:
+                particle_dic_temp1[j]=state.particle_dic[j]
+        new_state=basis(particle_dic=dict(particle_dic_temp1))
+        print(eyepreservation(new_state))
+        result=(coeff,new_state)
+        result_list.append(result)
+        for result in result_list:
+            for i in shell_basis:
+                if basis.eqnoorder(i,result[1]):
+                    temp_H=np.zeros((len(shell_basis),len(shell_basis)),dtype=complex)
+                    swapcount=basis.swaps(result[1],i)
+                    position1=(shell_basis.index(i),shell_basis.index(state))
+                    print(eyepreservation(i))
+                    print(result[0])
+                    print(position1)
+                    temp_H[position1]=((-1)**swapcount)*1*result[0]
+                    H10=H10+temp_H
+    print(np.nonzero(H10))
+    print(testh0[36,44])
+    print(eyepreservation(shell_basis[36]),eyepreservation(shell_basis[44]))
+    print(np.allclose(np.abs(testh0-np.conjugate(np.transpose(testh0))),np.zeros((len(shell_basis),len(shell_basis)))))
+    exit()
+    print(w0)
+    #print(np.nonzero(np.dot(H10,testwf)))
+
+
+
+    print('wf_test')
+    reswf=np.dot(testh0,testwf)
+    for i in range(len(testwf)):
+        if np.isclose(np.abs(reswf[i]),0)==False:
+            print(f'Input state {eyepreservation(shell_basis[ind])}, output state: {eyepreservation(shell_basis[i])}, amp: {reswf[i]}')
+    exit()
     inspect_elements(state_list=shell_basis,matrix=testh0)
     print(np.allclose(np.abs(testh0-np.conjugate(np.transpose(testh0))),np.zeros(testh0.shape)))
- 
+    exit()
     #print(np.linalg.eigh(testh0)[0])
     
     # print(testh0)
@@ -1217,13 +1318,12 @@ if __name__ == "__main__":
         H_linear=h_linear_diag(km=np.array([kx,ky]),v=v,term_list=test_linear_terms,state_list=shell_basis)
         H_tun=h_linear_diag(km=np.array([kx,ky]),state_list=shell_basis,term_list=test_tun_terms,v=1)
         return (H_linear+H_tun)
-    pathdiag.chained_path_plot_link(path_list=[vars_dic_Moire[start],vars_dic_Moire[end]],kpoints=300,generate_Hk=gen_Hk,UHK=UHK,mu=mu,Utau=Utau,Umu=Umu,Uff=Uff,names_reversed_var=names_reversed_Moire)
-    pathdiag.chained_path_plot_link(path_list=[vars_dic_Moire['GammaM'],vars_dic_Moire['MM']],kpoints=300,generate_Hk=gen_Hk,UHK=UHK,mu=mu,Utau=Utau,Umu=Umu,Uff=Uff,names_reversed_var=names_reversed_Moire)
-    pathdiag.chained_path_plot_link(path_list=[vars_dic_Moire['MM'],vars_dic_Moire['KM']],kpoints=300,generate_Hk=gen_Hk,UHK=UHK,mu=mu,Utau=Utau,Umu=Umu,Uff=Uff,names_reversed_var=names_reversed_Moire)
+    pathdiag.chained_path_plot_link(path_list=[vars_dic_Moire[start],vars_dic_Moire[end]],kpoints=kpoints,generate_Hk=gen_Hk,UHK=UHK,mu=mu,Utau=Utau,Umu=Umu,Uff=Uff,names_reversed_var=names_reversed_Moire)
+    pathdiag.chained_path_plot_link(path_list=[vars_dic_Moire['GammaM'],vars_dic_Moire['MM']],kpoints=kpoints,generate_Hk=gen_Hk,UHK=UHK,mu=mu,Utau=Utau,Umu=Umu,Uff=Uff,names_reversed_var=names_reversed_Moire)
+    pathdiag.chained_path_plot_link(path_list=[vars_dic_Moire['MM'],vars_dic_Moire['KM']],kpoints=kpoints,generate_Hk=gen_Hk,UHK=UHK,mu=mu,Utau=Utau,Umu=Umu,Uff=Uff,names_reversed_var=names_reversed_Moire)
     directory = os.fsencode("/Users/dmitrymanning-coe/Documents/Research/Barry Bradlyn/Moire/Numerics/pathdata")
     dstr="/Users/dmitrymanning-coe/Documents/Research/Barry Bradlyn/Moire/Numerics/pathdata"
     UHK=0
     mu_shift1=UHK/2
     params='UHK10'
-    theta='theta1.05'
-    plot.chained_path_plot(path_lists=[[KM,GammaM,MM,KM]],kpoints="300",directory=directory,dstr=dstr,mu_shift=mu_shift1,params=params,variable='diagandtun',theta=theta)    
+    plot.chained_path_plot(path_lists=[[KM,GammaM,MM,KM]],kpoints=str(kpoints),directory=directory,dstr=dstr,mu_shift=mu_shift1,params=params,variable='diagandtun',theta=f'theta{thetadeg}')    

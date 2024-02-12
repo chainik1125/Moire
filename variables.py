@@ -11,10 +11,17 @@ mu=(UHK+Utau)/2
 # w0=2*t
 # w1=2*t
 testpdd={'k':4,'sublattice':2,'spin':2}
-theta=(np.pi/180)*1.05
+thetadeg=5
+theta=(np.pi/180)*thetadeg
 phi=2*np.pi/3
 
-
+t=1
+v=5.944
+w1=0.11
+w0=0.7*w1
+Kmag=1.703
+shells_used=5
+kpoints=100
 
 Gamma=np.array([0,0])
 K=np.array([4*np.pi/3,0])
@@ -27,13 +34,13 @@ D=2*np.sqrt(np.vdot(K,K))*np.sin(theta/2)*np.array([np.sqrt(3)/2,-1/2])
 QTR=2*np.sqrt(np.vdot(K,K))*np.sin(theta/2)*np.array([np.sqrt(3)/2,1/2])
 QTL=2*np.sqrt(np.vdot(K,K))*np.sin(theta/2)*np.array([-np.sqrt(3)/2,1/2])
 
-kd=2*(1.703)*np.sin(theta/2)#2*np.sqrt(np.vdot(K,K))*np.sin(theta/2)
+kd=2*(Kmag)*np.sin(theta/2)#2*np.sqrt(np.vdot(K,K))*np.sin(theta/2)
 k1=np.array([0,-1])
 k2=np.array([np.sqrt(3)/2,1/2])
 k3=np.array([-np.sqrt(3)/2,1/2])
 
 
-qvecs=[np.array([-np.sqrt(3)/2,-1/2]),np.array([np.sqrt(3)/2,-1/2])]#q2,q3
+qvecs=[kd*np.array([-np.sqrt(3)/2,-1/2]),kd*np.array([np.sqrt(3)/2,-1/2])]#q2,q3
 # b1=8*qvecs[1]+qvecs[0]
 # b2=5*qvecs[1]-3*qvecs[0]
 KM=np.array([0,0])#Because you are in the K-centered model.

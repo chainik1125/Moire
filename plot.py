@@ -38,7 +38,7 @@ def json_open(filename):
         data = json.load(fp)
     return data
 
-colors={1:'black',2:'darkorange',3:'gold',4:'darkgreen',5:'lime',6:'blue',7:'cornflowerblue',8:'red',9:'olive',10:'rebeccapurple',11:'darkslategrey',12:'maroon',13:'lightcoral',14:'chocolate',15:'navy',16:'magenta',17:'gold',18:'navy',19:'orange',20:'magenta',21:'darkblue',22:'maroon',23:'yellow',24:'red',25:'cyan',30:'brown',32:'maroon',33:'slateblue',34:'brown',35:'peru',36:'brown',48:'crimson',49:'purple',68:'yellow',70:'red',np.nan:'blue'}
+colors={1:'black',2:'darkorange',3:'gold',4:'darkgreen',5:'lime',6:'blue',7:'cornflowerblue',8:'red',9:'olive',10:'rebeccapurple',11:'darkslategrey',12:'maroon',13:'lightcoral',14:'chocolate',15:'navy',16:'magenta',17:'gold',18:'navy',19:'orange',20:'magenta',21:'darkblue',22:'maroon',23:'yellow',24:'red',25:'cyan',30:'brown',32:'maroon',33:'slateblue',34:'brown',35:'peru',36:'brown',48:'crimson',49:'purple',68:'yellow',70:'red',np.nan:'blue',100:'slateblue'}
 
 directory = os.fsencode("/Users/dmitrymanning-coe/Documents/Research/Barry Bradlyn/Moire/Numerics/pathdata")
 dstr="/Users/dmitrymanning-coe/Documents/Research/Barry Bradlyn/Moire/Numerics/pathdata"
@@ -193,7 +193,7 @@ def grids_from_dicrot(stitched_dic,start,end):
 # exit()
 
 linescolored=16
-linesplotted=16
+linesplotted=500
 linesinlabel=16
 def chained_path_plot_link(path_list,start_path_count,axs,single,kpoints,directory,dstr,deg_list,mu_shift,params,variable,theta):
     deg_dict={}
@@ -222,14 +222,15 @@ def chained_path_plot_link(path_list,start_path_count,axs,single,kpoints,directo
             #colorsmap=[colors[x] for x in eig_dict_loop[j][1]]
             colorsmap=[]
             for x in range(0,len(eig_dict_loop[j][1])):
-                if j<linescolored:#This is to set how many lines you colors #UHK!#1.4 for not subtracted GS
+                if j<linesplotted:#This is to set how many lines you colors #UHK!#1.4 for not subtracted GS
+                    if eig_dict_loop[j][1][x]<linescolored:
                         colorsmap.append(colors[eig_dict_loop[j][1][x]])
-                else:
-                    # # kval=x_values[x]
-                    # if (x_values[x]<0.7 and x_values[x]>0.3 and eig_dict_loop[j][0][x]<3.5):#1.5 for not subtracted GS #or (x_values[x]<0.8 and x_values[x]>0.6 and eig_dict_loop[j][0][x]<1.5):
-                    #     colorsmap.append(colors[eig_dict_loop[j][1][x]])
-                    # else:
-                    colorsmap.append('dimgray')
+                    else:
+                        # # kval=x_values[x]
+                        # if (x_values[x]<0.7 and x_values[x]>0.3 and eig_dict_loop[j][0][x]<3.5):#1.5 for not subtracted GS #or (x_values[x]<0.8 and x_values[x]>0.6 and eig_dict_loop[j][0][x]<1.5):
+                        #     colorsmap.append(colors[eig_dict_loop[j][1][x]])
+                        # else:
+                        colorsmap.append('dimgray')
                 
             # print(eig_dict_loop[j][0][0])
             # print(x_values[0])
@@ -278,7 +279,7 @@ def chained_path_plot_link(path_list,start_path_count,axs,single,kpoints,directo
                         #     axs[i+start_path_count].set_xticklabels([var_dict_reversed[tuple(list_temp[0])],var_dict_reversed[tuple(list_temp[1])]],fontsize=tickfontsize)#+ '\n'+ var_greek_dict[tuple(list_temp[0])], + '\n'+ var_greek_dict[tuple(list_temp[1])]
                         #     axs[i+start_path_count].tick_params(axis='x', length=0)
                 
-                # axs[i].set_ylim([0, 2])
+                axs[i].set_ylim([-0.35, 0.35])
                 # if i==len(path_list)-2:
                 #     axs[i+start_path_count].set_xticks([0,0.7])
                 #     axs[i+start_path_count].set_xticklabels([var_dict_reversed[tuple(list_temp[0])]+ '-'+ var_greek_dict[tuple(list_temp[0])],var_dict_reversed[tuple(list_temp[1])]+ '-'+ var_greek_dict[tuple(list_temp[1])]],fontsize=5)
@@ -318,14 +319,21 @@ def chained_path_plot(path_lists,kpoints,directory,dstr,mu_shift,params,variable
     #leg = plt.figlegend(custom_lines,names, loc=(0.87, 0.11),title="Degeneracy",fontsize=20,title_fontsize=20)#0.464
     fig.subplots_adjust(right=0.85)
     angle=theta.split('theta')[-1]
-    fig.suptitle(r'One particle $\theta=$'+f'{angle}'+r'$^{\circ}$'+',  '+r'$U_{HK}=$'+f'{params[-1]}', fontsize=16)
+
+    fig.suptitle(r'One particle $\theta=$'+f'{angle}'+r'$^{\circ}$'+',  '+r'$U_{HK}=$'+f'{params[-1]}'+', '+r'$v_{f}=$'+f'{v}'+r'$eV A^{-1}$'+', '+r'$|K|=$'+f'{Kmag}'+', '+r'$w_1$='+f'{w1}'+r'$eV$'+', '+r'$w_0$='+f'{str(round(w0/w1,2))}'+r'$w_1$'+f' shells={shells_used}', fontsize=16)
     
     plt.show()
 
 if __name__ == "__main__":
-    mu_shift1=1
-    params='UHK10'
-    theta='theta1.05'
+    #mu_shift1=1
+    #params='UHK10'
+    #theta=f'theta{thetadeg}'
     #chained_path_plot(path_lists=[[Gamma,X,M]],kpoints="1000",directory=d6,dstr=dstr6,mu_shift=mu_shift1)
-    chained_path_plot(path_lists=[[KM,GammaM,KM]],kpoints="100",directory=directory,dstr=dstr,mu_shift=mu_shift1,params=params,variable='oneparticle',theta=theta)
+    #chained_path_plot(path_lists=[[KM,GammaM,KM]],kpoints="100",directory=directory,dstr=dstr,mu_shift=mu_shift1,params=params,variable='oneparticle',theta=theta)
     # chained_path_plot([[Gamma,X,M,Gamma,Z],[X,R],[M,A,R,Z,A]])
+    directory = os.fsencode("/Users/dmitrymanning-coe/Documents/Research/Barry Bradlyn/Moire/Numerics/pathdata")
+    dstr="/Users/dmitrymanning-coe/Documents/Research/Barry Bradlyn/Moire/Numerics/pathdata"
+    UHK=0
+    mu_shift1=UHK/2
+    params='UHK10'
+    chained_path_plot(path_lists=[[KM,GammaM,MM,KM]],kpoints="100",directory=directory,dstr=dstr,mu_shift=mu_shift1,params=params,variable='diagandtun',theta=f'theta{thetadeg}')    
